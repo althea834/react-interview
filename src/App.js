@@ -15,24 +15,24 @@ function App() {
   return (
     <Router>
       <div>
-      <AuthInfo />
+        <AuthInfo />
 
-      <ul>
-        <li><Link to="/public">Public Page</Link></li>
-        <li><Link to="/protected">Protected Page</Link></li>
-      </ul>
+        <ul>
+          <li><Link to="/public">Public Page</Link></li>
+          <li><Link to="/protected">Protected Page</Link></li>
+        </ul>
 
-      <Switch>
-        <Route path="/login">
-          <SignInPage />
-        </Route>
-        <Route path="/public">
-          <PublicPage />
-        </Route>
-        <PrivateRoute path="/protected">
-          <ProtectedPage />
-        </PrivateRoute>
-      </Switch>
+        <Switch>
+          <Route path="/login">
+            <SignInPage />
+          </Route>
+          <Route path="/public">
+            <PublicPage />
+          </Route>
+          <PrivateRoute path="/protected">
+            <ProtectedPage />
+          </PrivateRoute>
+        </Switch>
       </div>
     </Router>
   )
@@ -111,12 +111,12 @@ function SignInPage() {
     <div>
       <p>You must sign in to view the page at {from.pathname}</p>
       <div>
-        <input ref='username' type="text" defaultValue='username' />
+        <input type="text" />
       </div>
       <div>
-        <input ref='password' type="password" defaultValue='password' />
+        <input type="password" />
       </div>
-      <button styleName='btn' onClick={logIn}>
+      <button onClick={logIn}>
       Sign In
       </button>
     </div>
