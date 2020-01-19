@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -12,10 +12,21 @@ import {
 
 
 function App() {
+  const [status, setStatus] = useState(false);
+  const changeStatus = {
+    signin(cb) {
+      setStatus(true);
+      setTimeout(cb, 100);
+    },
+    signout(cb) {
+      setStatus(false)
+      setTimeout(cb, 100);
+    }
+  }
   return (
     <Router>
       <div>
-        <AuthInfo />
+        <AuthInfo status={status} changeStatus={changeStatus} />
 
         <ul>
           <li><Link to="/public">Public Page</Link></li>
@@ -24,13 +35,13 @@ function App() {
 
         <Switch>
           <Route path="/login">
-            <SignInPage />
+            <SignInPage status={status} changeStatus={changeStatus} />
           </Route>
           <Route path="/public">
             <PublicPage />
           </Route>
-          <PrivateRoute path="/protected">
-            <ProtectedPage />
+          <PrivateRoute path="/protected" status={status}>
+            <ProtectedPage status={status} />
           </PrivateRoute>
         </Switch>
       </div>
@@ -38,26 +49,15 @@ function App() {
   )
 }
 
-const simpleAuth = {
-  isAuthenticated: false,
-  authenticate(cb) {
-    simpleAuth.isAuthenticated = true;
-    setTimeout(cb, 50);
-  },
-  signout(cb) {
-    simpleAuth.isAuthenticated = false;
-    setTimeout(cb, 50);
-  }
-}
-
-function AuthInfo() {
+function AuthInfo(props) {
+  let { status, changeStatus } = props;
   let history = useHistory();
 
-  return simpleAuth.isAuthenticated ? (
+  return status ? (
     <p>
       Welcome!
     <button onClick={() => {
-        simpleAuth.signout(() => history.push("/"));
+        changeStatus.signout(history.push("/"));
       }}
       >
         Sign out
@@ -77,12 +77,13 @@ function ProtectedPage() {
   return <p>protected</p>;
 }
 
-function PrivateRoute({ children, ...rest }) {
+function PrivateRoute({ children, status, ...rest }) {
+  console.log({ ...rest })
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        simpleAuth.isAuthenticated ? (
+        status ? (
           children
         ) : (
             <Redirect
@@ -98,29 +99,35 @@ function PrivateRoute({ children, ...rest }) {
 }
 
 
-function SignInPage() {
+function SignInPage(props) {
+  let { status, changeStatus } = props;
   let history = useHistory();
   let location = useLocation();
   let { from } = location.state || { from: { pathname: "/" } };
+  console.log(location);
 
   let logIn = () => {
-    simpleAuth.authenticate(() => history.replace(from));
+    changeStatus.signin(history.replace(from.pathname));
   }
 
-  return (
-    <div>
-      <p>You must sign in to view the page at {from.pathname}</p>
+  return status ? (
+    <p>
+      You have signed in
+    </p>
+  ) : (
       <div>
-        <input type="text" />
-      </div>
-      <div>
-        <input type="password" />
-      </div>
-      <button onClick={logIn}>
-      Sign In
+        <p>You must sign in to view the page at {from.pathname}</p>
+        <div>
+          <input type="text" />
+        </div>
+        <div>
+          <input type="password" />
+        </div>
+        <button onClick={logIn}>
+          Sign In
       </button>
-    </div>
-  );
+      </div>
+    );
 }
 
 export default App;
